@@ -312,6 +312,20 @@ void testApp::keyPressed(int key){
 			triggers[triggers.size()-1].name+=char(key);
 		}
 	}
+    else
+    {
+        switch ( key )
+        {
+                case 'c':
+                case 'C':
+                cout << "CLEARING XML!!" << endl ;
+                ofxXmlSettings XML;
+                XML.saveFile("settings.xml");
+                triggers.clear() ; 
+                break ;
+        }
+        
+    }
 }
 
 //--------------------------------------------------------------

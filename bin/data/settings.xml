@@ -2,14 +2,8 @@
     <Send_Full_Spectrum>true</Send_Full_Spectrum>
 </prefs>
 <Trigger>
-    <name>bass&#x1B;</name>
-    <low_band>8</low_band>
-    <high_band>59</high_band>
-    <height>0.111328</height>
-</Trigger>
-<Trigger>
-    <name>&#x1B;</name>
-    <low_band>40</low_band>
-    <high_band>130</high_band>
-    <height>0.349609</height>
+    <name>bass</name>
+    <low_band>0</low_band>
+    <high_band>18</high_band>
+    <height>0.109375</height>
 </Trigger>
