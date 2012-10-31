@@ -43,6 +43,14 @@ void testApp::setup(){
 	triggerMode = TM_NONE;
 	
 	selTrigger = -1;
+    
+    bGuiEnabled = false ; 
+    amplitudeScale = 1.0f ;
+    triggerDelay = 0.1f ;
+    
+    setupOfxUI( ) ;
+    
+
 }
 
 //--------------------------------------------------------------
@@ -61,10 +69,11 @@ void testApp::loadSettings(){
 		
 		for(int i=0;i<numTriggers;i++)
 		{
-			Trigger newTrigger;
+			FftTrigger newTrigger;
+            float lowBand = XML.getValue("Trigger:low_band", 0, i);
+            float highBand = XML.getValue("Trigger:high_band", 10, i);
+            newTrigger.setup( lowBand , highBand ) ;
 			newTrigger.name = XML.getValue("Trigger:name", "error", i);
-			newTrigger.lowBand = XML.getValue("Trigger:low_band", 0, i);
-			newTrigger.highBand = XML.getValue("Trigger:high_band", 10, i);
 			newTrigger.height = XML.getValue("Trigger:height", 0.5f, i);
 			newTrigger.hit = false;
 			newTrigger.sent = false;
@@ -111,33 +120,27 @@ void testApp::update(){
 void testApp::draw(){
 	drawTriggers();
 	
-	ofPushMatrix();
-	
-	glTranslatef(16, 16, 0);	
-	ofSetColor(255,255,255);
-	ofDrawBitmapString("Audio Input", 0, 0);
-	
-	plot(audioInput, bufferSize, 64, 1, 32);
-	
-	
-	ofPopMatrix();
-	string msg = ofToString((int) ofGetFrameRate()) + " fps";
+    string status = "c - to clear\n " ;
+    ofSetColor( 255 , 255 , 255 ) ;
+    ofDrawBitmapString( status , 15 , 15 ) ;
+
+    string msg = ofToString((int) ofGetFrameRate()) + " fps";
 	ofDrawBitmapString(msg, ofGetWidth() - 80, ofGetHeight() - 3);
 	
 	
-	glTranslatef(0, ofGetHeight()-16, 0);
-	
-	if(useEQ)
-	{
-		ofDrawBitmapString("EQd FFT Output", 2, 13);
-		plot(eqOutput, fft->getBinSize(), -512, 4, 0);
-	}
-	else 
-	{
-		ofDrawBitmapString("FFT Output", 2, 13);
-		plot(fftOutput, fft->getBinSize(), -512, 4, 0);
-	}
-	
+    ofPushMatrix() ;
+        ofTranslate(0, ofGetHeight()-16, 0 ) ;
+        if(useEQ)
+        {
+            ofDrawBitmapString("EQd FFT Output", 2, 13);
+            plot(eqOutput, fft->getBinSize(), -512, 4, 0);
+        }
+        else 
+        {
+            ofDrawBitmapString("FFT Output", 2, 13);
+            plot(fftOutput, fft->getBinSize(), -512, 4, 0);
+        }
+	ofPopMatrix() ;
 	
 }
 
@@ -158,11 +161,13 @@ void testApp::drawTriggers()
 		else
 			ofSetColor(255,255,0);
 		
-		if(triggerMode == TM_NAMING && t==triggers.size()-1)
-			ofSetColor(0,255,0);
+		//if(triggerMode == TM_NAMING && t==triggers.size()-1)
+		//	ofSetColor(0,255,0);
 		
-		ofDrawBitmapString(triggers[t].name, triggers[t].lowBand*4, ofGetHeight() - 16 - triggers[t].height*512-8);
-		ofLine(triggers[t].lowBand*4, ofGetHeight() - 16 - triggers[t].height*512, triggers[t].highBand*4, ofGetHeight() - 16 - triggers[t].height*512);
+		triggers[t].draw ( ) ;
+        ofDrawBitmapString(triggers[t].name, triggers[t].lowBand*4, ofGetHeight() - 16 - triggers[t].height*512-8);
+		
+        //ofLine(triggers[t].lowBand*4, ofGetHeight() - 16 - triggers[t].height*512, triggers[t].highBand*4, ofGetHeight() - 16 - triggers[t].height*512);
 		
 		//cout<<triggers[t].lowBand*4<<","<<ofGetHeight() - 16 - triggers[t].height*512<<","<< triggers[t].highBand*4<<","<< ofGetHeight() - 16 - triggers[t].height*512<<endl;
 	}
@@ -199,13 +204,16 @@ void testApp::audioReceived(float* input, int bufferSize, int nChannels) {
 	if (mode == MIC)
 		memcpy(audioInput, input, sizeof(float) * bufferSize);
 	
+    for ( int b = 0 ; b < bufferSize ; b++ )
+        audioInput[b] *= amplitudeScale ;
+    
 	fft->setSignal(audioInput);
 	memcpy(fftOutput, fft->getAmplitude(), sizeof(float) * fft->getBinSize());
 	
 	if(useEQ)
 	{
 		for(int i = 0; i < fft->getBinSize(); i++)
-			eqOutput[i] = fftOutput[i] * eqFunction[i];
+			eqOutput[i] = fftOutput[i] * eqFunction[i] * amplitudeScale ;
 	}
 	
 	fft->setPolar(eqOutput, fft->getPhase());
@@ -236,7 +244,6 @@ void testApp::sendSpectrum()
 void testApp::sendTriggers()
 {
 	
-	
 	for(int t=0;t<triggers.size();t++)
 	{
 		if(triggers[t].hit)
@@ -257,27 +264,30 @@ void testApp::checkTriggers()
 {
 	for(int t=0;t<triggers.size();t++)
 	{
-		for(int b=0;b<fft->getBinSize();b++)
-		{
-			if(b >= triggers[t].lowBand && b <= triggers[t].highBand)
-			{
-				if(useEQ)
-				{
-					if(eqOutput[b]>triggers[t].height)
-						triggers[t].hit=true;
-				}
-				else {
-					if(fftOutput[b]>triggers[t].height)
-						triggers[t].hit=true;
-				}
-				
+        //if ( triggers[t].trigger() == true )
+        //{
+            for(int b=0;b<fft->getBinSize();b++)
+            {
+           
+                if(b >= triggers[t].lowBand && b <= triggers[t].highBand)
+                {
+                    if(useEQ)
+                    {
+                        if(eqOutput[b]>triggers[t].height)
+                            triggers[t].hit=true;
+                    }
+                    else {
+                        if(fftOutput[b]>triggers[t].height)
+                            triggers[t].hit=true;
+                    }
+                    
+                }
+                else {
+                    if(b > triggers[t].highBand)
+                        break;
+                }
 			}
-			else {
-				if(b > triggers[t].highBand)
-					break;
-			}
-			
-		}
+		//}
 	}
 }
 
@@ -316,12 +326,13 @@ void testApp::keyPressed(int key){
     {
         switch ( key )
         {
-                case 'c':
-                case 'C':
-                cout << "CLEARING XML!!" << endl ;
-                ofxXmlSettings XML;
-                XML.saveFile("settings.xml");
-                triggers.clear() ; 
+            case 'g':
+            case 'G':
+                bGuiEnabled = !bGuiEnabled ;
+               // if ( bGuiEnabled == true )
+                 //   gui->disable() ;
+               // else
+               //     gui->e() ;
                 break ;
         }
         
@@ -346,6 +357,7 @@ void testApp::mouseDragged(int x, int y, int button){
 		{
 			triggers[selTrigger].highBand = (x/4)+triggers[selTrigger].highBand-triggers[selTrigger].lowBand;
 			triggers[selTrigger].lowBand = x/4;
+            triggers[selTrigger].updateBands( ) ; 
 			triggers[selTrigger].height = (float(y - ofGetHeight()+16)*-1)/512;
 		}
 		oldMouse.set(x,y);
@@ -361,11 +373,18 @@ void testApp::mousePressed(int x, int y, int button){
 			//check to see if its touching any triggers here.
 			for(int t=0;t<triggers.size();t++)
 			{
+                if ( triggers[t].hitTest( x , y ) == true )
+                {
+                    //lowBand
+                    selTrigger = t;
+					break;
+                }
+                /*
 				if(x>=triggers[t].lowBand*4-2 && x<=triggers[t].highBand*4+2 && fabs(y - (ofGetHeight()-triggers[t].height*512-16)) < 10)
 				{
 					selTrigger = t;
 					break;
-				}
+				}*/
 			}
 			
 			
@@ -397,9 +416,10 @@ void testApp::mouseReleased(int x, int y, int button){
 	{
 		if(triggerMode==TM_SETTING && triggerMode != TM_NAMING && x > oldMouse.x)
 		{
-			Trigger newTrigger;
-			newTrigger.lowBand = oldMouse.x/4;
-			newTrigger.highBand = x/4;
+			FftTrigger newTrigger;
+            float lowBand = oldMouse.x/4.0f ;
+            float highBand = x/4.0f ;
+            newTrigger.setup( lowBand ,highBand ) ;
 			newTrigger.height = (float(y - ofGetHeight()+16)*-1)/512;
 			newTrigger.name = "[enter name]";
 			
@@ -422,6 +442,70 @@ void testApp::windowResized(int w, int h){
 	
 }
 
+void testApp::guiEvent(ofxUIEventArgs &e)
+{
+    string name = e.widget->getName();
+	int kind = e.widget->getKind();
+	
+	if(name == "CLEAR XML")
+	{
+		ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+		bClearXml = toggle->getValue();
+        if ( bClearXml == true )
+        {
+        cout << "CLEARING XML!!" << endl ;
+        ofxXmlSettings XML;
+        XML.saveFile("settings.xml");
+        triggers.clear() ;
+        }
+	}
+    if ( name == "AMPLITUDE SCALE" )
+    {
+        ofxUISlider *slider = (ofxUISlider *) e.widget;
+		amplitudeScale = slider->getScaledValue();
+        //cout << "value: " << slider->getScaledValue() << endl;
+    }
+    
+    if ( name == "TRIGGER DELAY" )
+    {
+        ofxUISlider *slider = (ofxUISlider *) e.widget;
+		triggerDelay = slider->getScaledValue();
+        for ( int t = 0 ; t < triggers.size() ; t++ )
+        {
+            triggers[t].minTriggerDelay = triggerDelay ;
+        }
+        //cout << "value: " << slider->getScaledValue() << endl;
+    }
+    
+    // gui->addWidgetRight(new ofxUISlider(length-xInit,dim, 0.0,1.2.0f, triggerDelay , "TRIGGER DELAY"));
+    //gui->addWidgetRight(new ofxUISlider(length-xInit,dim, 0.0,20.0f, amplitudeScale , "AMPLITUDE SCALE"));
+    
+    gui->saveSettings("GUI/fft.xml") ; 
+}
+
+void testApp::setupOfxUI()
+{
+    cout << "settings up ofxUI!" << endl ; 
+    bClearXml = false ;
+    
+    float dim = 24;
+	float xInit = OFX_UI_GLOBAL_WIDGET_SPACING;
+    float length = 200 ;
+	
+    gui = new ofxUICanvas(0, 0, ofGetWidth() , 400 );
+	
+    gui->addWidgetDown(new ofxUIToggle(50,50,bClearXml, "CLEAR XML" ) );
+    
+    gui->addWidgetRight(new ofxUISlider(length-xInit,dim, 0.0,20.0f, amplitudeScale , "AMPLITUDE SCALE"));
+    gui->addWidgetRight(new ofxUISlider(length-xInit,dim, 0.0,1.20f, triggerDelay , "TRIGGER DELAY"));
+    
+    //    amplitudeScale = 1.0f ;
+    ofAddListener(gui->newGUIEvent,this,&testApp::guiEvent);
+    gui->loadSettings("GUI/fft.xml") ;
+    
+  //  gui->disable() ;
+    
+}
 testApp::~testApp()
 {
 	saveSettings();

@@ -1,0 +1,15 @@
+<Widget>
+    <Kind>2</Kind>
+    <Name>CLEAR XML</Name>
+    <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>AMPLITUDE SCALE</Name>
+    <Value>3.125</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>TRIGGER DELAY</Name>
+    <Value>0.1</Value>
+</Widget>

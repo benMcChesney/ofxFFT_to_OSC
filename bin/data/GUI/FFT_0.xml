@@ -1,0 +1,102 @@
+<Widget>
+    <Kind>6</Kind>
+    <Name>FFT RANGE</Name>
+    <HighValue>57.7564</HighValue>
+    <LowValue>7.62821</LowValue>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>CENTER OFFSET</Name>
+    <Value>63.4615</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>GLOBAL EXTRUSION</Name>
+    <Value>369.923</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>MAX EXTRUSION</Name>
+    <Value>127.692</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>BAR WIDTH</Name>
+    <Value>4.16667</Value>
+</Widget>
+<Widget>
+    <Kind>11</Kind>
+    <Name>X + Y</Name>
+    <XValue>630.769</XValue>
+    <YValue>360</YValue>
+</Widget>
+<Widget>
+    <Kind>2</Kind>
+    <Name>DRAW FILL</Name>
+    <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>2</Kind>
+    <Name>DRAW BOTH SIDES</Name>
+    <Value>0</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>NOISE TIME MULTIPLIER</Name>
+    <Value>1.43718</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>NOISE STRENGTH</Name>
+    <Value>17.094</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>NOISE INDEX MULTIPLIER</Name>
+    <Value>0.581197</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>AMPLITUDE MULTIPLIER</Name>
+    <Value>23.4188</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>HUE</Name>
+    <Value>9.23077</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>SATURATION</Name>
+    <Value>216.923</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>BRIGHTNESS</Name>
+    <Value>100</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>HUE FFT MULTIPLIER</Name>
+    <Value>700.855</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>AMPLITUDE DIFF MULTIPLIER</Name>
+    <Value>230.769</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>CLEAR ALPHA</Name>
+    <Value>89.359</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>GLOBAL AMPLITUDE SCALE</Name>
+    <Value>452.991</Value>
+</Widget>
+<Widget>
+    <Kind>4</Kind>
+    <Name>INTERPOLATE TIME</Name>
+    <Value>0.0641026</Value>
+</Widget>

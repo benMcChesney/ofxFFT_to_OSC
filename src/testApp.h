@@ -5,6 +5,8 @@
 #include "ofMain.h"
 #include "ofxFft.h"
 #include "ofxOsc.h"
+#include "FftTrigger.h"
+#include "ofxUI.h"
 
 #define MIC 0
 #define NOISE 1
@@ -15,15 +17,6 @@
 
 enum Trigger_Mode_t {TM_NONE=0, TM_SETTING, TM_MOVING, TM_NAMING};
 
-struct Trigger {
-	int lowBand;
-	int highBand;
-	float height;
-	string name;
-	
-	bool hit;
-	bool sent;
-};
 
 class testApp : public ofBaseApp{
 	
@@ -77,7 +70,7 @@ public:
 	
 	
 	
-	vector <Trigger> triggers;
+	vector <FftTrigger> triggers;
 	
 	//trigger stuff for drawing.
 	ofPoint oldMouse;
@@ -85,6 +78,19 @@ public:
 	Trigger_Mode_t triggerMode;
 	
 	int selTrigger;
+    
+    
+    //ofxUI
+    ofxUICanvas *gui;
+	void guiEvent(ofxUIEventArgs &e);
+    
+    void setupOfxUI( ) ;
+    
+    bool bClearXml ;
+    bool bGuiEnabled ;
+    
+    float amplitudeScale ;
+    float triggerDelay ;
 };
 
 #endif
