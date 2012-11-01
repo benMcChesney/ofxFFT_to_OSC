@@ -114,15 +114,17 @@ void testApp::saveSettings()
 //--------------------------------------------------------------
 void testApp::update(){
 	handleOSC();
+    
+    for ( int t = 0 ; t < triggers.size() ; t++ )
+    {
+        triggers[t].update() ; 
+    }
 }
 
 //--------------------------------------------------------------
 void testApp::draw(){
 	drawTriggers();
-	
-    string status = "c - to clear\n " ;
-    ofSetColor( 255 , 255 , 255 ) ;
-    ofDrawBitmapString( status , 15 , 15 ) ;
+	ofSetColor( 255 , 255 , 255 ) ; 
 
     string msg = ofToString((int) ofGetFrameRate()) + " fps";
 	ofDrawBitmapString(msg, ofGetWidth() - 80, ofGetHeight() - 3);
@@ -148,28 +150,7 @@ void testApp::drawTriggers()
 {
 	for(int t=0;t<triggers.size();t++)
 	{
-		if(triggers[t].hit)
-		{
-			if(triggers[t].sent)
-			{
-				triggers[t].hit=false;
-				triggers[t].sent=false;
-			}
-			
-			ofSetColor(255,0,0);
-		}
-		else
-			ofSetColor(255,255,0);
-		
-		//if(triggerMode == TM_NAMING && t==triggers.size()-1)
-		//	ofSetColor(0,255,0);
-		
 		triggers[t].draw ( ) ;
-        ofDrawBitmapString(triggers[t].name, triggers[t].lowBand*4, ofGetHeight() - 16 - triggers[t].height*512-8);
-		
-        //ofLine(triggers[t].lowBand*4, ofGetHeight() - 16 - triggers[t].height*512, triggers[t].highBand*4, ofGetHeight() - 16 - triggers[t].height*512);
-		
-		//cout<<triggers[t].lowBand*4<<","<<ofGetHeight() - 16 - triggers[t].height*512<<","<< triggers[t].highBand*4<<","<< ofGetHeight() - 16 - triggers[t].height*512<<endl;
 	}
 	
 	if(triggerMode == TM_SETTING)
@@ -274,11 +255,11 @@ void testApp::checkTriggers()
                     if(useEQ)
                     {
                         if(eqOutput[b]>triggers[t].height)
-                            triggers[t].hit=true;
+                            triggers[t].trigger() ; //hit=true;
                     }
                     else {
                         if(fftOutput[b]>triggers[t].height)
-                            triggers[t].hit=true;
+                            triggers[t].trigger() ; //xhit=true;
                     }
                     
                 }
@@ -474,6 +455,7 @@ void testApp::guiEvent(ofxUIEventArgs &e)
         {
             triggers[t].minTriggerDelay = triggerDelay ;
         }
+        cout << "changing minTrigger delay to " << triggerDelay << endl ; 
         //cout << "value: " << slider->getScaledValue() << endl;
     }
     

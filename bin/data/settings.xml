@@ -4,6 +4,6 @@
 <Trigger>
     <name>bass</name>
     <low_band>0</low_band>
-    <high_band>27</high_band>
-    <height>0.228516</height>
+    <high_band>22</high_band>
+    <height>0.583984</height>
 </Trigger>

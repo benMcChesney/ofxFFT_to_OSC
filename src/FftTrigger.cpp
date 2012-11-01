@@ -19,18 +19,34 @@ void FftTrigger::setup ( float _lowBand , float _highBand )
    
 }
 
+void FftTrigger::update( )
+{
+    if( hit == true )
+    {
+        if( sent == true )
+        {
+            hit = false;
+            sent = false;
+        }
+        
+        color = ofColor(255,0,0);
+    }
+    else
+        color = ofColor(255,255,0);
+}
 void FftTrigger::draw( )
 {
     ofPushStyle() ;
         ofNoFill( ) ;
-    /*
-        if ( hit == true )
-            ofSetColor( 255 , 0 , 0 ) ; //255 - color.r , 255 - color.g , 255 - color.b ) ;
-        else
-            ofSetColor( 0 , 255 , 0 ) ; //color ) ;
-    */
-        updateBands( ) ; 
+    
+       // if ( hit == true )
+       //     ofSetColor( 255 , 0 , 0 ) ; //255 - color.r , 255 - color.g , 255 - color.b ) ;
+       // else
+       //     ofSetColor( 0 , 255 , 0 ) ; //color ) ;
+        ofSetColor( color ) ; 
+        updateBands( ) ;
         ofRect( bounds ) ;
+        ofDrawBitmapString( name , bounds.x +5 , bounds.y + 10 ) ;
     ofPopStyle() ;
 }
 
@@ -38,8 +54,9 @@ bool FftTrigger::trigger( )
 {
     if ( ofGetElapsedTimef() > ( lastTriggerTime + minTriggerDelay ))
     {
-        minTriggerDelay = 0.1f ;
+        //cout << "TRIGGER SHOULD BE ON! " << ofGetElapsedTimef() << endl ;
         lastTriggerTime = ofGetElapsedTimef() ;
+        hit = true ; 
         return true ;
     }
     else

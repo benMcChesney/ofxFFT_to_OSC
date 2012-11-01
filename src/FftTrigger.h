@@ -17,6 +17,7 @@ class FftTrigger
         ~FftTrigger ( ) { }
     
         void setup ( float lowBand , float highBand ) ;
+        void update ( ) ; 
         void draw( ) ;
         bool hitTest( float x , float y ) ;
     
