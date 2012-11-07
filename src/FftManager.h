@@ -20,7 +20,7 @@
 #define SINE 2
 
 #define HOST "localhost"
-#define PORT 1200
+#define PORT 12345
 
 enum Trigger_Mode_t {TM_NONE=0, TM_SETTING, TM_MOVING, TM_NAMING};
 
@@ -90,6 +90,8 @@ class FftManager
         bool sendFullSpectrum;
     
         float mouseX , mouseY ;
+    
+        bool bEditable ; 
         
 };
 

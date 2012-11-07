@@ -6,14 +6,14 @@
     <low_band>0</low_band>
     <high_band>8</high_band>
     <height>0.267578</height>
-    <maxFreq>0.357422</maxFreq>
-    <minFreq>0.164062</minFreq>
+    <maxFreq>0.482422</maxFreq>
+    <minFreq>0.189453</minFreq>
 </Trigger>
 <Trigger>
     <name>mids</name>
-    <low_band>64</low_band>
-    <high_band>75</high_band>
-    <height>0.253906</height>
-    <maxFreq>0.429688</maxFreq>
-    <minFreq>0.107422</minFreq>
+    <low_band>44</low_band>
+    <high_band>55</high_band>
+    <height>0.185547</height>
+    <maxFreq>0.304688</maxFreq>
+    <minFreq>0.128906</minFreq>
 </Trigger>

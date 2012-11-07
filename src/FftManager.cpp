@@ -11,6 +11,7 @@
 
 void FftManager::setup ( )
 {
+    bEditable = false ; 
     bufferSize = 512;
     
     fft = ofxFft::create(bufferSize, OF_FFT_WINDOW_BARTLETT);
@@ -79,7 +80,7 @@ void FftManager::draw ( )
     drawTriggers();
 	ofSetColor( 255 , 255 , 255 ) ;
     
-    string msg = ofToString((int) ofGetFrameRate()) + " fps";
+    string msg = "'e' - bEditable : " + ofToString ( bEditable ) + " | " + ofToString((int) ofGetFrameRate()) + " fps";
 	ofDrawBitmapString(msg, ofGetWidth() - 80, ofGetHeight() - 3);
 	
 	
@@ -96,8 +97,6 @@ void FftManager::draw ( )
         plot(fftOutput, fft->getBinSize(), -512, 4, 0);
     }
 	ofPopMatrix() ;
-    
-    
 }
 
 
@@ -252,17 +251,26 @@ void FftManager::sendTriggers()
 	
 	for(int t=0;t<triggers.size();t++)
 	{
+        ofxOscMessage m;
+        
+        m.clear();
+        
+        m.setAddress( "/"+triggers[t].name );
+        
+        
 		if(triggers[t].hit)
 		{
-			ofxOscMessage m;
-			
-			m.clear();
-			
-			m.setAddress( "/"+triggers[t].name );
 			m.addIntArg(1);
-			triggers[t].sent=true;
-			sender.sendMessage( m );
+            triggers[t].sent=true;
 		}
+        else
+        {
+            m.addIntArg( 0 ) ; 
+        }
+        
+        m.addFloatArg( triggers[t].averageAmplitude ) ;
+            
+        sender.sendMessage( m );
 	}
 }
 
@@ -331,6 +339,8 @@ void FftManager::checkTriggers()
 
 //--------------------------------------------------------------
 void FftManager::mouseDragged(ofMouseEventArgs &args ){
+    
+    if ( bEditable == false ) return ; 
     int x = args.x ;
     int y = args.y ;
     int button = args.button ;
@@ -350,6 +360,8 @@ void FftManager::mouseDragged(ofMouseEventArgs &args ){
 
 //--------------------------------------------------------------
 void FftManager::mousePressed(ofMouseEventArgs &args ){
+    
+        if ( bEditable == false ) return ; 
     int x = args.x ;
     int y = args.y ;
     int button = args.button ;
@@ -427,7 +439,10 @@ void FftManager::mousePressed(ofMouseEventArgs &args ){
 
 //--------------------------------------------------------------
 void FftManager::mouseReleased(ofMouseEventArgs &args )
-{    
+{
+    
+    if ( bEditable == false ) return ;
+    
     int x = args.x ;
     int y = args.y ;
     int button = args.button ;
@@ -459,7 +474,13 @@ void FftManager::mouseReleased(ofMouseEventArgs &args )
 
 //--------------------------------------------------------------
 void FftManager::keyPressed(ofKeyEventArgs &args){
-    int key = args.key ; 
+    int key = args.key ;
+ 
+    if  ( key == 'e' || key == 'E' )
+        bEditable = !bEditable ;
+    
+    if ( bEditable == false ) return ;
+
 	if(triggerMode == TM_NAMING)
 	{
 		if(key==13)//return
