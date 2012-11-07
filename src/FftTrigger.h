@@ -20,6 +20,8 @@ class FftTrigger
         void update ( ) ; 
         void draw( ) ;
         bool hitTest( float x , float y ) ;
+        bool hitTestX( float x  ) ; 
+        int aboveOrBelow( float y ) ;
     
         ofRectangle bounds ;
         float value ;
@@ -40,6 +42,9 @@ class FftTrigger
         float minTriggerDelay ;
         bool trigger() ;
     
+        float averageAmplitude ; 
+        float minFreq ;
+        float maxFreq ; 
     
 };
 

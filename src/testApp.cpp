@@ -60,7 +60,7 @@ void testApp::loadSettings(){
 	
 	ofxXmlSettings XML;
 	
-	if(XML.loadFile("settings.xml"))
+	if(XML.loadFile("fft_osc_settings.xml"))
 	{
 		if(XML.getValue("prefs:Send_Full_Spectrum", "true", 0)=="false")
 			sendFullSpectrum = false;
@@ -75,6 +75,9 @@ void testApp::loadSettings(){
             newTrigger.setup( lowBand , highBand ) ;
 			newTrigger.name = XML.getValue("Trigger:name", "error", i);
 			newTrigger.height = XML.getValue("Trigger:height", 0.5f, i);
+            newTrigger.minFreq = XML.getValue("Trigger:minFreq", 0.0f, i ) ;
+            newTrigger.maxFreq = XML.getValue("Trigger:maxFreq", 10.0f, i ) ;
+    
 			newTrigger.hit = false;
 			newTrigger.sent = false;
 			
@@ -105,10 +108,12 @@ void testApp::saveSettings()
 		XML.setValue("Trigger:low_band", triggers[t].lowBand, t);
 		XML.setValue("Trigger:high_band", triggers[t].highBand, t);
 		XML.setValue("Trigger:height", triggers[t].height, t);
+        XML.setValue("Trigger:maxFreq", triggers[t].maxFreq, t);
+        XML.setValue("Trigger:minFreq", triggers[t].minFreq, t);
 	}
 	
 	
-	XML.saveFile("settings.xml");
+	XML.saveFile("fft_osc_settings.xml");
 }
 
 //--------------------------------------------------------------
@@ -245,29 +250,60 @@ void testApp::checkTriggers()
 {
 	for(int t=0;t<triggers.size();t++)
 	{
+        triggers[t].averageAmplitude = 0.0f ; 
         //if ( triggers[t].trigger() == true )
         //{
+            float sumAmplitude = 0.0f ;
+            int amplitudeCount = 0 ;
+            //float bandRange = triggers[t].highBand - triggers[t].lowBand ;
             for(int b=0;b<fft->getBinSize();b++)
             {
-           
+                float amplitude ;
+                float maxFreq = triggers[t].maxFreq ;
+                float minFreq = triggers[t].minFreq ;
+                
                 if(b >= triggers[t].lowBand && b <= triggers[t].highBand)
                 {
+                    
                     if(useEQ)
                     {
+                        amplitude = eqOutput[b] ; 
+                       
                         if(eqOutput[b]>triggers[t].height)
                             triggers[t].trigger() ; //hit=true;
                     }
                     else {
+                        amplitude = fftOutput[b] ;
+                        //sumAmplitude+= fftOutput[b] ;
                         if(fftOutput[b]>triggers[t].height)
                             triggers[t].trigger() ; //xhit=true;
                     }
                     
+                    if ( amplitude >= triggers[t].minFreq && amplitude <= maxFreq )
+                    {
+                        if ( amplitude > maxFreq )
+                        {
+                            amplitude = maxFreq ;
+                        }
+                        sumAmplitude += amplitude ;
+                        amplitudeCount++ ; 
+                    }
+                    
                 }
                 else {
-                    if(b > triggers[t].highBand)
+                    if(b > triggers[t].highBand )
                         break;
                 }
 			}
+            
+            if ( amplitudeCount > 0 )
+            {
+                sumAmplitude /= ((float) amplitudeCount ) ;
+                sumAmplitude *= amplitudeScale ;
+                if ( sumAmplitude > 1.0f )
+                    sumAmplitude = 1.0f ; 
+                triggers[t].averageAmplitude = sumAmplitude ;
+            }
 		//}
 	}
 }
@@ -305,18 +341,82 @@ void testApp::keyPressed(int key){
 	}
     else
     {
+        //cout << "keyPressed : " << key << endl;
         switch ( key )
         {
             case 'g':
             case 'G':
                 bGuiEnabled = !bGuiEnabled ;
-               // if ( bGuiEnabled == true )
-                 //   gui->disable() ;
-               // else
-               //     gui->e() ;
                 break ;
+                
+            case 356:
+                for ( int t = 0 ; t < triggers.size() ; t++ )
+                {
+                    if ( triggers[t].hitTest( mouseX , mouseY ) == true )
+                    {
+                        if( triggers[t].highBand > 0 )
+                            triggers[t].highBand -= 1 ;
+                        break;
+                    }
+                }
+               
+                break ;
+                
+            case 358:
+                for ( int t = 0 ; t < triggers.size() ; t++ )
+                {
+                    if ( triggers[t].hitTest( mouseX , mouseY ) == true )
+                    {
+                        if( triggers[t].highBand < fft->getBinSize() )
+                            triggers[t].highBand += 1 ;
+                        break;
+                    }
+                }
+                break ; 
+                
+            case ',':
+            case '<':
+                for ( int t = 0 ; t < triggers.size() ; t++ )
+                {
+                    if ( triggers[t].hitTest( mouseX , mouseY ) == true )
+                    {
+                        if( triggers[t].lowBand > 0 )
+                            triggers[t].lowBand -= 1 ;
+                        break;
+                    }
+                }
+
+                break ;
+                
+            case '.':
+            case '>':
+                for ( int t = 0 ; t < triggers.size() ; t++ )
+                {
+                    if ( triggers[t].hitTest( mouseX , mouseY ) == true )
+                    {
+                        if( triggers[t].lowBand < fft->getBinSize() )
+                            triggers[t].lowBand += 1 ;
+                        break;
+                    }
+                }
+
+                
+                break ;
+                
+            case 's':
+            case 'S':
+                saveSettings() ;
+                break ;
+                
+            //createNewTrigger
+            case 'n' :
+            case 'N' :
+                createNewTrigger( mouseX , mouseY ) ;
+                break ;
+
         }
         
+                
     }
 }
 
@@ -376,15 +476,43 @@ void testApp::mousePressed(int x, int y, int button){
 					oldMouse.set(x,y);
 					triggerMode = TM_MOVING;
 				}
-				else
+				if ( button == 1 ) 
 				{
+                    if ( triggers.size() > 0 ) 
 					triggers.erase(triggers.begin()+selTrigger);
 				}
+                if ( button == 2 )
+                {
+                    //Left button
+                    for(int t=0 ; t<triggers.size() ; t++ )
+                    {
+                        if ( triggers[t].hitTestX( mouseX ) == true )
+                        {
+                            
+                            float _adjustedY = mouseY - 240 ;
+                            float adjustedY = (512 - _adjustedY) / 512.0f ;
+                            cout << "adjustedY " << _adjustedY << endl ;
+                            int aboveOrBelow = triggers[t].aboveOrBelow( mouseY ) ;
+                            if ( aboveOrBelow == 1 )
+                            {
+                                triggers[t].minFreq = adjustedY ;
+                            }
+                            if ( aboveOrBelow == -1 )
+                            {
+                                triggers[t].maxFreq = adjustedY ;
+                            }
+                        
+                            //lowBand
+                            selTrigger = t;
+                            break;
+                        }
+                    }
+                }
 			}
 			else //not trying to select any other trigger
 			{
-				oldMouse.set(x,y);
-				triggerMode = TM_SETTING;
+				//oldMouse.set(x,y);
+				//triggerMode = TM_SETTING;
 			}
 			
 		}
@@ -416,6 +544,15 @@ void testApp::mouseReleased(int x, int y, int button){
 			triggerMode = TM_NONE;
 		}
 	}
+}
+
+void testApp::createNewTrigger ( float x , float y )
+{
+    if(y>ofGetHeight()-528 && triggerMode != TM_NAMING && y<ofGetHeight()-16)
+	{
+        oldMouse.set(x,y);
+        triggerMode = TM_SETTING;
+    }
 }
 
 //--------------------------------------------------------------
@@ -459,6 +596,22 @@ void testApp::guiEvent(ofxUIEventArgs &e)
         //cout << "value: " << slider->getScaledValue() << endl;
     }
     
+    if ( name == "SEND FULL FFT" )
+    {
+        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+		sendFullSpectrum = toggle->getValue();
+        //cout << "value: " << slider->getScaledValue() << endl;
+    }
+    
+    if ( name == "USE EQ" )
+    {
+        ofxUIToggle *toggle = (ofxUIToggle *) e.widget;
+		useEQ = toggle->getValue();
+        //cout << "value: " << slider->getScaledValue() << endl;
+    }
+    
+    //gui->addWidgetDown(new ofxUIToggle(50,50,useEQ, "USE EQ" ) );
+    //gui->addWidgetDown(new ofxUIToggle(50,50,sendFullSpectrum, "SEND FULL FFT" ) );
     // gui->addWidgetRight(new ofxUISlider(length-xInit,dim, 0.0,1.2.0f, triggerDelay , "TRIGGER DELAY"));
     //gui->addWidgetRight(new ofxUISlider(length-xInit,dim, 0.0,20.0f, amplitudeScale , "AMPLITUDE SCALE"));
     
@@ -477,8 +630,11 @@ void testApp::setupOfxUI()
     gui = new ofxUICanvas(0, 0, ofGetWidth() , 400 );
 	
     gui->addWidgetDown(new ofxUIToggle(50,50,bClearXml, "CLEAR XML" ) );
+    gui->addWidgetRight(new ofxUIToggle(50,50,sendFullSpectrum, "SEND FULL FFT" ) );
+    gui->addWidgetRight(new ofxUIToggle(50,50,useEQ, "USE EQ" ) );
     
-    gui->addWidgetRight(new ofxUISlider(length-xInit,dim, 0.0,20.0f, amplitudeScale , "AMPLITUDE SCALE"));
+    
+    gui->addWidgetDown(new ofxUISlider(length-xInit,dim, 0.0,20.0f, amplitudeScale , "AMPLITUDE SCALE"));
     gui->addWidgetRight(new ofxUISlider(length-xInit,dim, 0.0,1.20f, triggerDelay , "TRIGGER DELAY"));
     
     //    amplitudeScale = 1.0f ;

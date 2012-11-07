@@ -1,9 +1,11 @@
 <prefs>
-    <Send_Full_Spectrum>true</Send_Full_Spectrum>
+    <Send_Full_Spectrum>false</Send_Full_Spectrum>
 </prefs>
 <Trigger>
     <name>bass</name>
     <low_band>0</low_band>
-    <high_band>22</high_band>
-    <height>0.583984</height>
+    <high_band>12</high_band>
+    <height>0.103516</height>
+    <maxFreq>0.476562</maxFreq>
+    <minFreq>0.0253906</minFreq>
 </Trigger>

@@ -68,8 +68,6 @@ public:
 	bool sendFullSpectrum;
 	
 	
-	
-	
 	vector <FftTrigger> triggers;
 	
 	//trigger stuff for drawing.
@@ -91,6 +89,8 @@ public:
     
     float amplitudeScale ;
     float triggerDelay ;
+    
+    void createNewTrigger ( float x , float y ) ; 
 };
 
 #endif
