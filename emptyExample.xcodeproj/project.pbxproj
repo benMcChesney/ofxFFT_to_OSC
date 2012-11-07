@@ -31,6 +31,7 @@
 		D9172FED1640CF240005179A /* ofxFftBasic.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9172FE21640CF240005179A /* ofxFftBasic.cpp */; };
 		D9172FEE1640CF240005179A /* ofxFftw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9172FE41640CF240005179A /* ofxFftw.cpp */; };
 		D91731A51640E07D0005179A /* FftTrigger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D91731A41640E07D0005179A /* FftTrigger.cpp */; };
+		D9582B3D1649F4E300F8D4FA /* FftManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = D9582B3C1649F4E300F8D4FA /* FftManager.cpp */; };
 		E4328149138ABC9F0047C5CB /* openFrameworksDebug.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E4328148138ABC890047C5CB /* openFrameworksDebug.a */; };
 		E45BE97B0E8CC7DD009D7055 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9710E8CC7DD009D7055 /* AGL.framework */; };
 		E45BE97C0E8CC7DD009D7055 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E45BE9720E8CC7DD009D7055 /* ApplicationServices.framework */; };
@@ -172,6 +173,8 @@
 		D917311F1640DED40005179A /* ofxUIWidgetWithLabel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ofxUIWidgetWithLabel.h; sourceTree = "<group>"; };
 		D91731A31640E0040005179A /* FftTrigger.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FftTrigger.h; sourceTree = "<group>"; };
 		D91731A41640E07D0005179A /* FftTrigger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FftTrigger.cpp; sourceTree = "<group>"; };
+		D9582B3B1649F4D400F8D4FA /* FftManager.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FftManager.h; sourceTree = "<group>"; };
+		D9582B3C1649F4E300F8D4FA /* FftManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FftManager.cpp; sourceTree = "<group>"; };
 		E4328143138ABC890047C5CB /* openFrameworksLib.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = openFrameworksLib.xcodeproj; path = ../../../libs/openFrameworksCompiled/project/osx/openFrameworksLib.xcodeproj; sourceTree = SOURCE_ROOT; };
 		E45BE9710E8CC7DD009D7055 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = /System/Library/Frameworks/AGL.framework; sourceTree = "<absolute>"; };
 		E45BE9720E8CC7DD009D7055 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
@@ -568,6 +571,8 @@
 				E4B69E1F0A3A1BDC003C02F2 /* testApp.h */,
 				D91731A31640E0040005179A /* FftTrigger.h */,
 				D91731A41640E07D0005179A /* FftTrigger.cpp */,
+				D9582B3B1649F4D400F8D4FA /* FftManager.h */,
+				D9582B3C1649F4E300F8D4FA /* FftManager.cpp */,
 			);
 			path = src;
 			sourceTree = SOURCE_ROOT;
@@ -690,6 +695,7 @@
 				D9172FED1640CF240005179A /* ofxFftBasic.cpp in Sources */,
 				D9172FEE1640CF240005179A /* ofxFftw.cpp in Sources */,
 				D91731A51640E07D0005179A /* FftTrigger.cpp in Sources */,
+				D9582B3D1649F4E300F8D4FA /* FftManager.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
